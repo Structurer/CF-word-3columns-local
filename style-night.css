@@ -1,0 +1,699 @@
+/* 全局重置与基础样式 - 夜间模式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+}
+
+.init-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #1a1a2e; /* 深色初始页背景 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+.init-screen h1 {
+  font-size: 36px;
+  color: #72ddf7; /* 浅色主标题 */
+  margin-bottom: 20px;
+  text-align: center;
+  letter-spacing: 2px;
+}
+.init-screen p {
+  font-size: 18px;
+  color: #a6a6c9; /* 浅灰色说明文字 */
+  margin-bottom: 40px;
+  text-align: center;
+  padding: 0 20px;
+  max-width: 1000px;
+}
+.init-screen .start-btn {
+  padding: 12px 24px;
+  font-size: 16px;
+  background-color: #72ddf7; /* 浅色按钮 */
+  color: #1a1a2e; /* 深色文字 */
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  box-shadow: 0 2px 8px rgba(114, 221, 247, 0.2);
+}
+.init-screen .start-btn:hover {
+  background-color: #4cc9f0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(114, 221, 247, 0.3);
+}
+.init-screen.hidden {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+body {
+  background-color: #12121e; /* 全局深色背景 */
+  overflow: hidden;
+}
+
+/* 主容器：三列布局 */
+.main-container {
+  display: flex;
+  gap: 20px;
+  padding: 30px;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+/* 三列统一样式 - 夜间模式 */
+.mastered-section, .untrained-section, .review-section {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  padding: 20px;
+}
+.mastered-section, .untrained-section {
+  background-color: #1a1a2e; /* 列深色背景 */
+}
+.review-section {
+  background-color: #1f1f35; /* 中间列稍浅深色 */
+}
+
+/* 三列顶部标题容器 */
+.mastered-header, .untrained-header, .review-top-fixed {
+  padding: 0 0 8px 0;
+  border-bottom: 1px solid #33334d; /* 深色分隔线 */
+  margin-bottom: 8px;
+}
+
+/* 列标题样式 - 夜间模式 */
+.mastered-title, .untrained-title, .review-top-fixed h1 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #e0e0f7; /* 浅色标题文字 */
+  margin-bottom: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #33334d;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 优化后输入框样式 - 夜间模式 */
+#wordInput {
+  width: 100%;
+  padding: 12px 16px;
+  margin: 10px 0;
+  box-sizing: border-box;
+  border: 1px solid #33334d; /* 深色边框 */
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #e0e0f7; /* 浅色文字 */
+  background-color: #26263d; /* 输入框深色背景 */
+  outline: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  caret-color: #72ddf7;
+  text-decoration-thickness: 6px;
+}
+
+/* 聚焦时样式 - 夜间模式 */
+#wordInput:focus {
+  border-color: #72ddf7;
+  box-shadow: 0 0 0 3px rgba(114, 221, 247, 0.2);
+  background-color: #2a2a44;
+}
+
+/* 输入时文字样式 - 夜间模式 */
+#wordInput::placeholder {
+  color: #7a7a9d; /* 占位文字深灰色 */
+  font-size: 16px;
+  font-weight: normal;
+}
+
+/* 正确状态：绿色边框闪烁动画 - 夜间模式 */
+#wordInput.success {
+  animation: flashGreen 0.5s ease;
+}
+/* 错误状态：粉色边框闪烁动画 - 夜间模式 */
+#wordInput.error {
+  animation: flashPink 0.5s ease;
+}
+
+/* 绿色闪烁动画 - 夜间模式 */
+@keyframes flashGreen {
+  0% { border-color: #33334d; }
+  50% { border-color: #4ade80; box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2); }
+  100% { border-color: #33334d; }
+}
+/* 粉色闪烁动画 - 夜间模式 */
+@keyframes flashPink {
+  0% { border-color: #33334d; }
+  50% { border-color: #f472b6; box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.2); }
+  100% { border-color: #33334d; }
+}
+
+/* 计数徽章样式 - 夜间模式 */
+.count-badge {
+  font-size: 16px;
+  color: #72ddf7;
+  font-weight: normal;
+  background-color: #2a2a44; /* 徽章深色背景 */
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: auto;
+}
+
+/* 左右列滚动区域 */
+.mastered-list, .untrained-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 0 8px 0;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  min-height: 0;
+}
+.mastered-list::-webkit-scrollbar, .untrained-list::-webkit-scrollbar {
+  display: none;
+}
+
+/* 中间列顶部固定区域 - 夜间模式 */
+.review-top-fixed {
+  position: relative;
+  top: 0;
+  background-color: #1f1f35;
+  z-index: 10;
+  padding-top: 4px;
+}
+
+/* 控制栏按钮样式 - 夜间模式 */
+.control-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 3px;
+  margin-top: 10px;
+  padding-top: 2px;
+  justify-content: space-between;
+  width: 100%;
+}
+.btn {
+  padding: 6px 12px;
+  font-size: 14px;
+  background-color: #72ddf7;
+  color: #1a1a2e;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+/* 上传按钮 - 夜间模式 */
+.btn.upload-btn {
+  background-color: #38bdf8;
+}
+.btn.upload-btn:hover {
+  background-color: #0ea5e9;
+}
+/* 下载按钮 - 夜间模式 */
+.btn.download-btn {
+  background-color: #4ade80;
+}
+.btn.download-btn:hover {
+  background-color: #22c55e;
+}
+/* 原有按钮样式保持 - 夜间模式 */
+.btn:hover {
+  background-color: #4cc9f0;
+  transform: translateY(-1px);
+}
+.btn.reset {
+  background-color: #ef4444;
+}
+.btn.reset:hover {
+  background-color: #dc2626;
+}
+.btn:disabled {
+  background-color: #444466;
+  cursor: not-allowed;
+  opacity: 0.8;
+  transform: none;
+}
+
+/* 新增：统一禁用按钮颜色 - 夜间模式 */
+.btn.download-btn:disabled {
+  background-color: #444466 !important;
+  opacity: 0.8;
+}
+.btn.reset:disabled {
+  background-color: #444466 !important;
+  opacity: 0.8;
+}
+
+/* 中间列卡片滚动区域 - 夜间模式 */
+.review-card-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 0 8px 0;
+  min-height: 0;
+  overscroll-behavior-y: contain;
+  will-change: scroll-position;
+}
+
+/* 中间列滚动条美化 - 夜间模式 */
+.review-card-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.review-card-scroll::-webkit-scrollbar-track {
+  background: #26263d;
+  border-radius: 3px;
+}
+.review-card-scroll::-webkit-scrollbar-thumb {
+  background: #444466;
+  border-radius: 3px;
+}
+.review-card-scroll::-webkit-scrollbar-thumb:hover {
+  background: #555577;
+}
+
+#wordCardWrapper {
+  width: 100%;
+}
+
+/* 单词卡片样式 - 夜间模式 */
+.mastered-card, .untrained-card {
+  background-color: #26263d; /* 卡片深色背景 */
+  border: 1px solid #33334d;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 8px;
+  transition: background-color 0.3s, border 0.3s, box-shadow 0.3s;
+}
+.mastered-card:hover, .untrained-card:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+}
+.word-card {
+  background-color: #2a2a44;
+  border: 1px solid #3a3a55;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 8px;
+  transition: background-color 0.3s, border 0.3s, box-shadow 0.3s;
+}
+.word-card:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+/* 中间列选中卡片样式 - 夜间模式 */
+.word-card.active {
+  background-color: #333355;
+  border-color: #72ddf7;
+  box-shadow: 0 2px 6px rgba(114, 221, 247, 0.2);
+  transform: translateY(0);
+}
+
+/* 最新标记卡片样式 - 夜间模式 */
+.mastered-card.latest {
+  background-color: #2a3f3a;
+  border-color: #4ade80;
+  box-shadow: 0 2px 8px rgba(74, 222, 128, 0.2);
+}
+.untrained-card.latest {
+  background-color: #3f2a3a;
+  border-color: #f472b6;
+  box-shadow: 0 2px 8px rgba(244, 114, 182, 0.2);
+}
+
+/* 单词标题样式 - 夜间模式 */
+.word-header {
+  margin-bottom: 8px;
+}
+.word {
+  font-size: 18px;
+  font-weight: bold;
+  color: #e0e0f7;
+  text-align: left !important;
+}
+
+/* 释义容器样式 - 夜间模式 */
+.translations-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* 释义和词性样式 - 夜间模式 */
+.translation-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.translation-item:hover .meaning {
+  color: #72ddf7;
+}
+.meaning {
+  color: #c0c0e0; /* 释义浅文字 */
+  display: inline-block;
+  transition: color 0.3s ease;
+}
+.pos-tag {
+  background-color: #33334d;
+  color: #72ddf7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* 释义隐藏控制 - 夜间模式 */
+[data-controlled="true"] .translation-item .meaning.hidden {
+  display: none;
+}
+.mastered-card .translation-item .meaning.hidden,
+.untrained-card .translation-item .meaning.hidden {
+  display: inline;
+}
+
+/* 空状态样式 - 夜间模式 */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #a6a6c9;
+  font-size: 15px;
+  line-height: 1.8;
+  background-color: #26263d;
+  border-radius: 8px;
+  margin: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  user-select: none;
+}
+/* 记忆区空状态特殊提示 - 夜间模式 */
+#wordList .empty-state {
+  color: #72ddf7;
+  font-size: 16px;
+  padding: 80px 20px;
+}
+#wordList .empty-state::before {
+  content: "🎉 ";
+  font-size: 24px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+/* 顶部双提示容器样式 - 夜间模式 */
+#uploadInput {
+  display: none;
+}
+
+.top-tip-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 34px;
+  background-color: #26263d;
+  border-bottom: 1px solid #33334d;
+  z-index: 999;
+}
+
+.shortcut-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  color: #72ddf7;
+  font-size: 14px;
+  line-height: 34px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.operation-feedback {
+  position: absolute;
+  top: 0;
+  left: 20px;
+  height: 100%;
+  color: #4ade80; /* 成功色 */
+  font-size: 14px;
+  line-height: 34px;
+  text-align: left;
+  z-index: 1000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50%;
+}
+
+/* 反馈类型样式 - 夜间模式 */
+.operation-feedback.error {
+  color: #ef4444;
+}
+.operation-feedback.warning {
+  color: #facc15;
+}
+.operation-feedback.info {
+  color: #72ddf7;
+}
+
+/* 词汇表名称展示样式 - 夜间模式 */
+.vocabulary-name-display {
+  position: absolute;
+  top: 0;
+  right: 20px;
+  height: 100%;
+  line-height: 34px;
+  font-size: 14px;
+  color: #72ddf7;
+  padding: 0 8px;
+  border: none;
+  cursor: pointer;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-underline-offset: 2px;
+  transition: color 0.3s ease;
+}
+.vocabulary-name-display:hover {
+  color: #4cc9f0;
+  border-color: transparent;
+}
+
+/* 词汇表名称编辑输入框 - 夜间模式 */
+.vocabulary-name-input {
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  width: auto;
+  min-width: 80px;
+  max-width: 200px;
+  padding: 2px 8px;
+  font-size: 14px;
+  color: #e0e0f7;
+  border: 1px solid #444466;
+  border-radius: 4px;
+  outline: none;
+  background-color: #26263d;
+  box-shadow: none;
+  transition: border-color 0.3s ease;
+}
+.vocabulary-name-input:focus {
+  border-color: #72ddf7;
+  box-shadow: 0 0 0 2px rgba(114, 221, 247, 0.2);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 保留这段夜间空状态，删上面白天的 */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #a6a6c9;
+  font-size: 15px;
+  line-height: 1.8;
+  background-color: #26263d; /* 深色背景，适配夜间 */
+  border-radius: 8px;
+  margin: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  user-select: none;
+}
+
+
+
+
+
+/* 禁止所有单词卡片内文本选中（包括单词、释义、词性） */
+.mastered-card, .word-card, .untrained-card {
+    user-select: none; /* 核心属性，禁止文本选中 */
+    -webkit-user-select: none; /* 兼容webkit内核浏览器（Chrome/Safari） */
+    -moz-user-select: none; /* 兼容Firefox */
+    -ms-user-select: none; /* 兼容IE/Edge */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 滑动轨迹线条+箭头样式（夜间模式） */
+.slide-trace {
+    position: fixed;
+    height: 3px;
+    background: #72ddf7; /* 夜间主题色，与按钮/输入框光标色一致 */
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.8; /* 夜间适当提高透明度，更醒目 */
+    transition: none;
+    top: var(--trace-top);
+    overflow: visible;
+}
+
+/* 左滑：箭头在左端，朝左（夜间模式） */
+.slide-trace.left::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-right: 8px solid #72ddf7; /* 夜间主题箭头色 */
+}
+
+/* 右滑：箭头在右端，朝右（夜间模式） */
+.slide-trace.right::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 8px solid #72ddf7; /* 夜间主题箭头色 */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+.shortcut-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  color: #72ddf7;
+  font-size: 14px;
+  line-height: 34px;
+  text-align: center;
+  pointer-events: auto;
+}
+.tip-text {
+  transition: opacity 0.3s;
+}
+.theme-switch-btn {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #72ddf7;
+  color: #1a1a2e;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.shortcut-tip:hover .tip-text {
+  opacity: 0;
+  visibility: hidden;
+}
+.shortcut-tip:hover .theme-switch-btn {
+  opacity: 1;
+}
+.theme-switch-btn:hover {
+  background: #4cc9f0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 白天模式（style-day.css）和夜间模式（style-night.css）都添加这段 */
+body {
+  /* 核心：禁用页面所有文本选中 */
+  user-select: none;
+  -webkit-user-select: none; /* Chrome/Safari */
+  -moz-user-select: none;    /* Firefox */
+  -ms-user-select: none;     /* IE/Edge */
+}
+
+/* 注意：如果输入框（#wordInput）需要正常输入，单独给它恢复选中 */
+#wordInput {
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+}

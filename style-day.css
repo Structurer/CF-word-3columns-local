@@ -1,0 +1,743 @@
+/* 全局重置与基础样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+}
+
+.init-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+.init-screen h1 {
+  font-size: 36px;
+  color: #4299e1;
+  margin-bottom: 20px;
+  text-align: center;
+  letter-spacing: 2px;
+}
+.init-screen p {
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 40px;
+  text-align: center;
+  padding: 0 20px;
+  max-width: 1000px;
+}
+.init-screen .start-btn {
+  padding: 12px 24px;
+  font-size: 16px;
+  background-color: #4299e1;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  box-shadow: 0 2px 8px rgba(66, 153, 225, 0.2);
+}
+.init-screen .start-btn:hover {
+  background-color: #3182ce;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+}
+.init-screen.hidden {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+body {
+  background-color: #f5f5f5;
+  overflow: hidden;
+}
+
+/* 主容器：三列布局 */
+.main-container {
+  display: flex;
+  gap: 20px;
+  padding: 30px;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+/* 三列统一样式 */
+.mastered-section, .untrained-section, .review-section {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  padding: 20px;
+}
+.mastered-section, .untrained-section {
+  background-color: #fafafa;
+}
+.review-section {
+  background-color: #f8f9fa;
+}
+
+/* 三列顶部标题容器 */
+.mastered-header, .untrained-header, .review-top-fixed {
+  padding: 0 0 8px 0;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 8px;
+}
+
+/* 列标题样式 */
+.mastered-title, .untrained-title, .review-top-fixed h1 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2d3748;
+  margin-bottom: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 优化后输入框样式，适配页面清新风格 */
+#wordInput {
+  width: 100%;
+  padding: 12px 16px; /* 增加内边距，避免文字拥挤 */
+  margin: 10px 0;
+  box-sizing: border-box;
+  border: 1px solid #e8f4f8; /* 浅边框，贴合卡片风格 */
+  border-radius: 8px; /* 圆角更圆润，减少生硬感 */
+  font-size: 18px; /* 增大字体，输入更清晰 */
+  font-weight: bold; /* 字体稍粗，提升可读性 */
+  color: #2d3748; /* 文字颜色加深，更醒目 */
+  background-color: #ffffff; /* 纯白背景，与输入框外的浅灰形成对比 */
+  outline: none;
+  transition: all 0.3s ease; /* 所有变化加过渡，更丝滑 */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* 轻微阴影，增加层次感 */
+  caret-color: #4299e1;
+  text-decoration-thickness: 6px; /* 光标宽度改为 2px（默认约 1px），数值越大越粗 */
+}
+
+/* 聚焦时样式（核心反馈） */
+#wordInput:focus {
+  border-color: #4299e1; /* 边框变色，与页面主色调一致 */
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15); /* 外发光，聚焦提示明显 */
+  background-color: #fafdff; /* 聚焦时背景微变，增强交互感 */
+}
+
+/* 输入时文字样式（可选，进一步优化体验） */
+#wordInput::placeholder {
+  color: #a0aec0; /* 占位文字灰色调，不刺眼 */
+  font-size: 16px;
+  font-weight: normal;
+}
+
+/* 正确状态：绿色边框闪烁动画 */
+#wordInput.success {
+  animation: flashGreen 0.5s ease;
+}
+/* 错误状态：粉色边框闪烁动画 */
+#wordInput.error {
+  animation: flashPink 0.5s ease;
+}
+
+/* 绿色闪烁动画：原边框→绿色→原边框 */
+@keyframes flashGreen {
+  0% { border-color: #e8f4f8; } /* 输入框默认边框色 */
+  50% { border-color: #34d399; box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.15); } /* 左列绿色+发光 */
+  100% { border-color: #e8f4f8; }
+}
+/* 粉色闪烁动画：原边框→粉色→原边框 */
+@keyframes flashPink {
+  0% { border-color: #e8f4f8; } /* 输入框默认边框色 */
+  50% { border-color: #d946ef; box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.15); } /* 右列粉色+发光 */
+  100% { border-color: #e8f4f8; }
+}
+
+/* 计数徽章样式 */
+.count-badge {
+  font-size: 16px;
+  color: #4299e1;
+  font-weight: normal;
+  background-color: #f0f8fb;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: auto;
+}
+
+/* 左右列滚动区域 */
+.mastered-list, .untrained-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 0 8px 0;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  min-height: 0;
+}
+.mastered-list::-webkit-scrollbar, .untrained-list::-webkit-scrollbar {
+  display: none;
+}
+
+/* 中间列顶部固定区域 */
+.review-top-fixed {
+  position: relative;
+  top: 0;
+  background-color: #f8f9fa;
+  z-index: 10;
+  padding-top: 4px;
+}
+
+/* 控制栏按钮样式 - 保留上一版风格 */
+.control-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 3px;
+  margin-top: 10px;
+  padding-top: 2px;
+  justify-content: space-between;
+  width: 100%;
+}
+.btn {
+  padding: 6px 12px;
+  font-size: 14px;
+  background-color: #4299e1;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+/* 上传按钮：区分颜色，增强识别度 */
+.btn.upload-btn {
+  background-color: #38bdf8;
+}
+.btn.upload-btn:hover {
+  background-color: #0ea5e9;
+}
+/* 下载按钮：区分颜色，增强识别度 */
+.btn.download-btn {
+  background-color: #34d399;
+}
+.btn.download-btn:hover {
+  background-color: #10b981;
+}
+/* 原有按钮样式保持 */
+.btn:hover {
+  background-color: #3182ce;
+  transform: translateY(-1px);
+}
+.btn.reset {
+  background-color: #dc3545;
+}
+.btn.reset:hover {
+  background-color: #c82333;
+}
+.btn:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.8;
+  transform: none;
+}
+
+
+
+
+
+
+
+
+/* 原有其他样式... */
+
+/* 新增：统一禁用按钮颜色（解决下载、随机按钮变色问题） */
+.btn.download-btn:disabled {
+  background-color: #6c757d !important;
+  opacity: 0.8;
+}
+
+.btn.reset:disabled {
+  background-color: #6c757d !important;
+  opacity: 0.8;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 中间列卡片滚动区域（最终优化版：针对超大跨度滚动） */
+.review-card-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 0 8px 0;
+  min-height: 0;
+  overscroll-behavior-y: contain; /* 算力聚焦，不串场 */
+  will-change: scroll-position; /* 告诉浏览器提前准备渲染资源 */
+}
+
+/* 中间列滚动条美化 */
+.review-card-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.review-card-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+.review-card-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+.review-card-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+#wordCardWrapper {
+  width: 100%;
+}
+
+/* 单词卡片样式 */
+.mastered-card, .untrained-card {
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 8px;
+  transition: background-color 0.3s, border 0.3s, box-shadow 0.3s;
+}
+.mastered-card:hover, .untrained-card:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
+}
+.word-card {
+  background-color: #f5fafe;
+  border: 1px solid #e0eef7;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 8px;
+  transition: background-color 0.3s, border 0.3s, box-shadow 0.3s;
+}
+.word-card:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
+}
+
+/* 中间列选中卡片样式 */
+.word-card.active {
+  background-color: #e0f2fe;
+  border-color: #7dd3fc;
+  box-shadow: 0 2px 6px rgba(56, 189, 248, 0.15);
+  transform: translateY(0);
+}
+
+/* 最新标记卡片样式 */
+.mastered-card.latest {
+  background-color: #f0fdf4;
+  border-color: #34d399;
+  box-shadow: 0 2px 8px rgba(52, 211, 153, 0.1);
+}
+.untrained-card.latest {
+  background-color: #faf0f5;
+  border-color: #d946ef;
+  box-shadow: 0 2px 8px rgba(217, 70, 239, 0.1);
+}
+
+/* 单词标题样式 */
+.word-header {
+  margin-bottom: 8px;
+}
+.word {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2d3748;
+  text-align: left !important;
+}
+
+/* 释义容器样式 */
+.translations-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* 释义和词性样式 */
+.translation-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer; /* 记忆区释义可点击，添加指针提示 */
+}
+.translation-item:hover .meaning {
+  color: #4299e1; /* hover时释义变色，增强交互感 */
+}
+.meaning {
+  color: #4a5568;
+  display: inline-block;
+  transition: color 0.3s ease;
+}
+.pos-tag {
+  background-color: #e8f4f8;
+  color: #2b6cb0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* 释义隐藏控制 */
+[data-controlled="true"] .translation-item .meaning.hidden {
+  display: none;
+}
+.mastered-card .translation-item .meaning.hidden,
+.untrained-card .translation-item .meaning.hidden {
+  display: inline;
+}
+
+/* 空状态样式 - 优化排版和颜色，更醒目 */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+  font-size: 15px;
+  line-height: 1.8;
+  background-color: #fefefe;
+  border-radius: 8px;
+  margin: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+/* 记忆区空状态特殊提示 */
+#wordList .empty-state {
+  color: #4299e1;
+  font-size: 16px;
+  padding: 80px 20px;
+}
+#wordList .empty-state::before {
+  content: "🎉 ";
+  font-size: 24px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+/* 顶部双提示容器样式（整合去重，保留最新逻辑） */
+#uploadInput {
+  display: none;
+}
+
+.top-tip-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 34px; /* 与子容器高度一致 */
+  background-color: #e8f4f8;
+  border-bottom: 1px solid #bee3f8;
+  z-index: 999;
+}
+
+.shortcut-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  color: #2b6cb0;
+  font-size: 14px;
+  line-height: 34px; /* 垂直居中 */
+  text-align: center;
+  pointer-events: none; /* 避免遮挡下方点击 */
+}
+
+.operation-feedback {
+  position: absolute;
+  top: 0;
+  left: 20px;
+  height: 100%;
+  color: #155724; /*
+    /* 成功色默认 */
+  font-size: 14px;
+  line-height: 34px; /* 垂直居中 */
+  text-align: left;
+  z-index: 1000; /* 确保在快捷键提示上方显示 */
+  white-space: nowrap; /* 避免提示文字换行 */
+  overflow: hidden; /* 隐藏超出部分 */
+  text-overflow: ellipsis; /* 超出部分显示省略号 */
+  max-width: 50%; /* 限制最大宽度，避免遮挡快捷键提示 */
+}
+
+/* 反馈类型样式（从HTML内嵌迁移，统一管理） */
+.operation-feedback.error {
+  color: #721c24;
+}
+.operation-feedback.warning {
+  color: #856404;
+}
+.operation-feedback.info {
+  color: #2b6cb0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 词汇表名称展示样式（取消方框，优化视觉） */
+.vocabulary-name-display {
+  position: absolute;
+  top: 0;
+  right: 20px;
+  height: 100%;
+  line-height: 34px; /* 垂直居中 */
+  font-size: 14px;
+  color: #2b6cb0; /* 保留原有文字色 */
+  padding: 0 8px;
+  /* 取消边框（去掉方框） */
+  border: none; 
+  cursor: pointer;
+  max-width: 200px; /* 限制最大宽度，避免文字过长 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* 新增hover效果，替代边框提示可点击 */
+  text-underline-offset: 2px;
+  transition: color 0.3s ease;
+}
+
+/* 鼠标悬浮时文字变色，增强交互感 */
+.vocabulary-name-display:hover {
+  color: #4299e1; /* hover时文字变深，无突兀边框 */
+  border-color: transparent; /* 确保无边框 */
+}
+
+/* 词汇表名称编辑输入框（和谐化，与文字长度匹配） */
+.vocabulary-name-input {
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  /* 取消固定宽度，让输入框随文字长度自适应 */
+  width: auto; 
+  min-width: 80px; /* 最小宽度，避免过窄 */
+  max-width: 200px; /* 最大宽度，避免遮挡 */
+  padding: 2px 8px;
+  font-size: 14px;
+  color: #2b6cb0; /* 保留原有文字色 */
+  /* 弱化边框，避免突兀 */
+  border: 1px solid #cbd5e1; 
+  border-radius: 4px;
+  outline: none;
+  /* 底色与顶部容器一致，融入环境 */
+  background-color: #e8f4f8; 
+  box-shadow: none; /* 取消阴影，减少存在感 */
+  /* 聚焦时轻微强化，提示激活状态 */
+  transition: border-color 0.3s ease;
+}
+
+/* 输入框聚焦时，边框变色提示（不突兀） */
+.vocabulary-name-input:focus {
+  border-color: #4299e1;
+  box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.1); /* 弱发光，不刺眼 */
+}
+
+
+
+
+
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+  font-size: 15px;
+  line-height: 1.8;
+  background-color: #fefefe;
+  border-radius: 8px;
+  margin: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  user-select: none; /* 新增：所有空状态提示都禁止选中 */
+}
+
+
+
+
+
+
+/* 禁止所有单词卡片内文本选中（包括单词、释义、词性） */
+.mastered-card, .word-card, .untrained-card {
+    user-select: none; /* 核心属性，禁止文本选中 */
+    -webkit-user-select: none; /* 兼容webkit内核浏览器（Chrome/Safari） */
+    -moz-user-select: none; /* 兼容Firefox */
+    -ms-user-select: none; /* 兼容IE/Edge */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.slide-trace {
+    position: fixed;
+    height: 3px;
+    background: #4096ff;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.7;
+    transition: none;
+    top: var(--trace-top);
+    overflow: visible;
+}
+/* 左滑专用：线+左箭头（左端朝左） */
+.slide-trace.left {
+    background: #4096ff;
+}
+.slide-trace.left::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-right: 8px solid #4096ff; /* 朝左箭头 */
+}
+/* 右滑专用：线+右箭头（右端朝右） */
+.slide-trace.right {
+    background: #4096ff;
+}
+.slide-trace.right::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 8px solid #4096ff; /* 朝右箭头 */
+}
+
+
+
+
+
+
+
+
+
+
+
+.shortcut-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  color: #2b6cb0;
+  font-size: 14px;
+  line-height: 34px;
+  text-align: center;
+  pointer-events: auto;
+}
+.tip-text {
+  transition: opacity 0.3s;
+}
+.theme-switch-btn {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #4299e1;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+/* hover时文字消失，按钮显示 */
+.shortcut-tip:hover .tip-text {
+  opacity: 0;
+  visibility: hidden;
+}
+.shortcut-tip:hover .theme-switch-btn {
+  opacity: 1;
+}
+.theme-switch-btn:hover {
+  background: #3182ce;
+}
+
+
+
+
+
+
+
+
+
+
+/* 白天模式（style-day.css）和夜间模式（style-night.css）都添加这段 */
+body {
+  /* 核心：禁用页面所有文本选中 */
+  user-select: none;
+  -webkit-user-select: none; /* Chrome/Safari */
+  -moz-user-select: none;    /* Firefox */
+  -ms-user-select: none;     /* IE/Edge */
+}
+
+/* 注意：如果输入框（#wordInput）需要正常输入，单独给它恢复选中 */
+#wordInput {
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+}
