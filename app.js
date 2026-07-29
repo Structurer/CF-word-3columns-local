@@ -26,12 +26,6 @@
 
 
 
-// 新增：页面加载后立即初始化（删除初始化界面后，无需等待点击“开始”）
-window.addEventListener('load', () => {
-    initBaseEvents();
-    initKeyboardEvents();
-});
-
 // 全局变量定义（数据存储+状态控制）
 let toReviewWords = [];    // 记忆区单词数组（完整对象：word/translations/type）
 let masteredWords = [];    // 已牢记单词数组
@@ -41,6 +35,217 @@ let isMeaningHidden = false; // 释义显示状态
 let isInited = false;      // 应用初始化状态
 // 新增：词汇表名称（初始值与HTML默认文本一致，用于展示、编辑、下载命名）
 let vocabularyName = "未选择文件";
+
+// ============ 缓存系统常量 ============
+const CACHE_KEYS = {
+    REVIEW: 'cf_rv',       // 记忆区
+    MASTERED: 'cf_ms',     // 已牢记
+    UNTRAINED: 'cf_ut',    // 待巩固
+    META: 'cf_meta'        // 元数据
+};
+const CACHE_VERSION = 2;   // 缓存版本号，用于数据迁移（v2: 完整CET6词库）
+const SEED_VOCAB_NAME = 'CET6词汇'; // 种子数据默认词汇表名
+const STORAGE_CHUNK_SIZE = 500000;   // localStorage 单条存储分片大小（500KB）
+
+/**
+ * 压缩单词对象（存储时节省空间）
+ * word → w, translations → t, translation → m, type → y
+ */
+function compressWord(obj) {
+    return {
+        w: obj.word || '',
+        t: (obj.translations || []).map(t => ({
+            m: t.translation || '',
+            y: t.type || ''
+        }))
+    };
+}
+
+/**
+ * 解压单词对象（读取时还原格式）
+ * w → word, t → translations, m → translation, y → type
+ */
+function decompressWord(obj) {
+    return {
+        word: obj.w || '',
+        translations: (obj.t || []).map(t => ({
+            translation: t.m || '',
+            type: t.y || ''
+        }))
+    };
+}
+
+/**
+ * 分片存储数组数据（防止 localStorage 单条超限）
+ */
+function saveChunkedData(key, dataArray) {
+    const jsonStr = JSON.stringify(dataArray.map(compressWord));
+    if (jsonStr.length <= STORAGE_CHUNK_SIZE) {
+        localStorage.setItem(key + '_0', jsonStr);
+        localStorage.setItem(key + '_count', '1');
+    } else {
+        const chunks = [];
+        for (let i = 0; i < jsonStr.length; i += STORAGE_CHUNK_SIZE) {
+            chunks.push(jsonStr.substr(i, STORAGE_CHUNK_SIZE));
+        }
+        localStorage.setItem(key + '_count', String(chunks.length));
+        chunks.forEach((chunk, i) => {
+            localStorage.setItem(key + '_' + i, chunk);
+        });
+    }
+}
+
+/**
+ * 分片读取数组数据
+ */
+function loadChunkedData(key) {
+    try {
+        const countStr = localStorage.getItem(key + '_count');
+        if (!countStr) {
+            // 兼容旧版单条存储
+            const oldData = localStorage.getItem(key);
+            if (oldData) {
+                localStorage.removeItem(key);
+                saveChunkedData(key, JSON.parse(oldData));
+                return JSON.parse(oldData).map(decompressWord);
+            }
+            return [];
+        }
+        const count = parseInt(countStr);
+        const parts = [];
+        for (let i = 0; i < count; i++) {
+            const part = localStorage.getItem(key + '_' + i);
+            if (part) parts.push(part);
+        }
+        const jsonStr = parts.join('');
+        return jsonStr ? JSON.parse(jsonStr).map(decompressWord) : [];
+    } catch (e) {
+        console.warn(`读取分片数据失败 (${key}):`, e.message);
+        return [];
+    }
+}
+
+/**
+ * 清除分片存储的所有相关键
+ */
+function clearChunkedData(key) {
+    const countStr = localStorage.getItem(key + '_count');
+    if (countStr) {
+        const count = parseInt(countStr);
+        for (let i = 0; i < count; i++) {
+            localStorage.removeItem(key + '_' + i);
+        }
+        localStorage.removeItem(key + '_count');
+    }
+    localStorage.removeItem(key); // 清除旧版单条存储
+}
+
+/**
+ * 保存数据到 localStorage
+ */
+function saveToCache() {
+    try {
+        const meta = {
+            v: CACHE_VERSION,
+            n: vocabularyName,
+            i: currentIndex
+        };
+        saveChunkedData(CACHE_KEYS.REVIEW, toReviewWords);
+        saveChunkedData(CACHE_KEYS.MASTERED, masteredWords);
+        saveChunkedData(CACHE_KEYS.UNTRAINED, untrainedWords);
+        localStorage.setItem(CACHE_KEYS.META, JSON.stringify(meta));
+    } catch (e) {
+        console.warn('缓存保存失败（可能存储空间不足）：', e.message);
+    }
+}
+
+/**
+ * 从 localStorage 加载数据
+ * @returns {boolean} 是否成功加载
+ */
+function loadFromCache() {
+    try {
+        const metaStr = localStorage.getItem(CACHE_KEYS.META);
+        if (!metaStr) return false;
+
+        const meta = JSON.parse(metaStr);
+        if (meta.v !== CACHE_VERSION) {
+            console.warn(`缓存版本不匹配（期望${CACHE_VERSION}，实际${meta.v}），使用种子数据`);
+            return false;
+        }
+
+        toReviewWords = loadChunkedData(CACHE_KEYS.REVIEW);
+        masteredWords = loadChunkedData(CACHE_KEYS.MASTERED);
+        untrainedWords = loadChunkedData(CACHE_KEYS.UNTRAINED);
+        vocabularyName = meta.n || '未命名词汇表';
+        currentIndex = Math.min(meta.i || 0, Math.max(0, toReviewWords.length - 1));
+
+        return true;
+    } catch (e) {
+        console.warn('缓存读取失败：', e.message);
+        return false;
+    }
+}
+
+/**
+ * 使用种子数据初始化（首次使用或缓存无效时调用）
+ */
+function initFromSeed() {
+    if (!window.WORD_SEED_DATA || !Array.isArray(window.WORD_SEED_DATA)) {
+        console.error('种子数据未加载，请确保 seed-data.js 在 app.js 之前引入');
+        return false;
+    }
+
+    // 解压种子数据并初始化
+    toReviewWords = window.WORD_SEED_DATA.map(decompressWord);
+    masteredWords = [];
+    untrainedWords = [];
+    currentIndex = 0;
+    vocabularyName = SEED_VOCAB_NAME;
+
+    // 保存到缓存
+    saveToCache();
+    return true;
+}
+
+/**
+ * 清除缓存（用于调试或重置）
+ */
+function clearCache() {
+    clearChunkedData(CACHE_KEYS.REVIEW);
+    clearChunkedData(CACHE_KEYS.MASTERED);
+    clearChunkedData(CACHE_KEYS.UNTRAINED);
+    localStorage.removeItem(CACHE_KEYS.META);
+}
+
+// ============ 缓存系统结束 ============
+
+// 新增：页面加载后立即初始化
+window.addEventListener('load', () => {
+    // 优先从缓存加载，否则使用种子数据
+    const loadedFromCache = loadFromCache();
+    if (!loadedFromCache) {
+        const seeded = initFromSeed();
+        if (seeded) {
+            showFeedback(`🌱 已加载默认词汇（CET6 ${toReviewWords.length}词）`, 'info');
+        }
+    } else {
+        showFeedback(`💾 已从缓存恢复：${vocabularyName}`, 'success');
+    }
+
+    // 更新HTML中的词汇表名称显示
+    const nameDisplay = document.getElementById('vocabularyNameDisplay');
+    if (nameDisplay) nameDisplay.textContent = vocabularyName;
+
+    // 设置初始化状态并更新UI
+    if (toReviewWords.length > 0 || masteredWords.length > 0 || untrainedWords.length > 0) {
+        isInited = true;
+        updateAllUI();
+    }
+
+    initBaseEvents();
+    initKeyboardEvents();
+});
 
 // 新增滑动相关全局变量
 let startX = 0; // 滑动起始X坐标
@@ -193,6 +398,9 @@ async function handleJsonUpload(file) {
 
     // 新增：更新HTML中的词汇表名称显示
     document.getElementById('vocabularyNameDisplay').textContent = vocabularyName;
+
+    // 保存到缓存
+    saveToCache();
 }
 
 /**
@@ -240,6 +448,9 @@ async function handleZipUpload(file) {
 
     // 新增：更新HTML中的词汇表名称显示
     document.getElementById('vocabularyNameDisplay').textContent = vocabularyName;
+
+    // 保存到缓存
+    saveToCache();
 }
 
 /**
@@ -352,6 +563,8 @@ function bindVocabularyNameEdit() {
             displayEl.textContent = newName;
             // 用展示元素替换输入框
             containerEl.replaceChild(displayEl, inputEl);
+            // 保存到缓存
+            saveToCache();
             // 显示修改成功的反馈
             showFeedback(`词汇表名称已更新为：${newName}`, 'info');
         };
@@ -485,6 +698,7 @@ function bindSlideToContainer(container, area) {
                         showFeedback(`➡️  单词「${movedWord.word}」移至待巩固`, 'info');
                     }
                     updateAllUI();
+                    saveToCache(); // 保存到缓存
                     break;
             }
         }
@@ -601,6 +815,7 @@ function shuffleToReviewWords() {
     toReviewWords = [...toReviewWords].sort(() => Math.random() - 0.5);
     currentIndex = 0; // 重置选中索引到第一个
     updateReviewWordsUI(); // 刷新记忆区UI
+    saveToCache(); // 保存到缓存
     showFeedback('🔀 记忆区单词已打乱', 'info');
 }
 
@@ -787,6 +1002,7 @@ function moveFromSideToReview(wordObj, fromArea) {
 
     // 4. 刷新UI+提示
     updateAllUI();
+    saveToCache(); // 保存到缓存
     showFeedback(`🔄 单词「${wordObj.word}」移至记忆区`, 'info');
 }
 
@@ -887,6 +1103,7 @@ async function moveToMastered() {
 
     // 刷新UI并显示提示
     updateAllUI();
+    saveToCache(); // 保存到缓存
     showFeedback(`⬅️  单词「${movedWord.word}」移至已牢记`, 'info');
 }
 
@@ -905,6 +1122,7 @@ async function moveToUntrained() {
 
     // 刷新UI并显示提示
     updateAllUI();
+    saveToCache(); // 保存到缓存
     showFeedback(`➡️  单词「${movedWord.word}」移至待巩固`, 'info');
 }
 
