@@ -241,6 +241,11 @@ window.addEventListener('load', () => {
     if (toReviewWords.length > 0 || masteredWords.length > 0 || untrainedWords.length > 0) {
         isInited = true;
         updateAllUI();
+        // 启用功能按钮（缓存恢复/种子数据加载路径同样需要启用，
+        // 否则首次加载默认词库时下载/隐藏释义/随机顺序三个按钮会一直处于 disabled 状态）
+        if (dom.toggleMeaningBtn) dom.toggleMeaningBtn.disabled = false;
+        if (dom.shuffleBtn) dom.shuffleBtn.disabled = false;
+        if (dom.downloadBtn) dom.downloadBtn.disabled = false;
     }
 
     initBaseEvents();
